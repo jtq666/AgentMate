@@ -8,7 +8,7 @@ LLM 根据用户输入自主判断意图并选择 Agent。
 from __future__ import annotations
 
 import logging
-from eduagent.agents.base import AgentState, BaseAgent
+from agentmate.agents.base import AgentState, BaseAgent
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class AgentCoordinator:
         if self._llm is None:
             try:
                 from langchain_openai import ChatOpenAI
-                from eduagent.config import settings
+                from agentmate.config import settings
                 self._llm = ChatOpenAI(
                     model=settings.llm.model, temperature=0,
                     max_tokens=200,

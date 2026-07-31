@@ -41,12 +41,12 @@ class KnowledgeBase:
     - RRF：1/(k+rank) 多路融合，无需分数校准
     """
 
-    def __init__(self, collection_name: str = "eduagent_kb", persist_dir: str = None):
+    def __init__(self, collection_name: str = "agentmate_kb", persist_dir: str = None):
         self._collection_name = collection_name
         self._docs: list[dict] = []
         self._doc_freqs: dict[str, int] = {}
         self._total_docs = 0
-        self._persist_dir = persist_dir or "eduagent/data"
+        self._persist_dir = persist_dir or "agentmate/data"
 
         # ChromaDB
         self._collection = None

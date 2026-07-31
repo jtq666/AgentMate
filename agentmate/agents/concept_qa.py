@@ -7,7 +7,7 @@
 
 from __future__ import annotations
 
-from eduagent.agents.base import AgentState, BaseAgent
+from agentmate.agents.base import AgentState, BaseAgent
 
 
 class ConceptQAAgent(BaseAgent):
@@ -49,7 +49,7 @@ class ConceptQAAgent(BaseAgent):
         # 3. LLM 生成回答
         try:
             from langchain_openai import ChatOpenAI
-            from eduagent.config import settings
+            from agentmate.config import settings
             llm = ChatOpenAI(model=settings.llm.model, temperature=0.3, max_tokens=800,
                              api_key=settings.llm.api_key, base_url=settings.llm.base_url)
 

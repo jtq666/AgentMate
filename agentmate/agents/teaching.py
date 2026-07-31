@@ -18,10 +18,10 @@ from __future__ import annotations
 
 import json
 import re
-from eduagent.agents.arch import (
+from agentmate.agents.arch import (
     AgentPhase, AgentTrajectory, PlannerEngine, ReflexionEngine, ToolRegistry,
 )
-from eduagent.agents.base import AgentState, BaseAgent
+from agentmate.agents.base import AgentState, BaseAgent
 
 
 # ==================== 内置工具函数 ====================
@@ -42,7 +42,7 @@ def _tool_analyze_code(code: str, language: str = "cpp") -> str:
     """分析代码结构"""
     if not code:
         return "没有代码可分析"
-    from eduagent.code_engine.analyzer import analyze_code
+    from agentmate.code_engine.analyzer import analyze_code
     m = analyze_code(code, language)
     parts = [
         f"语言: {m.language}, 总行数: {m.total_lines}",
@@ -110,7 +110,7 @@ class TeachingAgent(BaseAgent):
         )
 
     async def run(self, state: AgentState) -> AgentState:
-        from eduagent.config import settings
+        from agentmate.config import settings
         from langchain_openai import ChatOpenAI
 
         llm = ChatOpenAI(model=settings.llm.model, temperature=0.3, max_tokens=600,

@@ -33,7 +33,7 @@ class AppConfig:
     chunk_size: int = 512
     chunk_overlap: int = 64
     top_k: int = 5
-    memory_dir: str = str(PROJECT_ROOT / "eduagent" / "data" / "memory")
+    memory_dir: str = str(PROJECT_ROOT / "agentmate" / "data" / "memory")
 
 
 @dataclass

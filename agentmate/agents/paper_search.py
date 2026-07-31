@@ -6,8 +6,8 @@ LLM 提取搜索词 → 调用 Semantic Scholar API → 展示质量评分 → �
 
 from __future__ import annotations
 
-from eduagent.agents.base import AgentState, BaseAgent
-from eduagent.knowledge.paper_api import search_papers
+from agentmate.agents.base import AgentState, BaseAgent
+from agentmate.knowledge.paper_api import search_papers
 
 
 class PaperSearchAgent(BaseAgent):
@@ -27,7 +27,7 @@ class PaperSearchAgent(BaseAgent):
         # 1. LLM 提取搜索关键词
         try:
             from langchain_openai import ChatOpenAI
-            from eduagent.config import settings
+            from agentmate.config import settings
             llm = ChatOpenAI(model=settings.llm.model, temperature=0, max_tokens=100,
                              api_key=settings.llm.api_key, base_url=settings.llm.base_url)
 

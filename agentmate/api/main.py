@@ -33,14 +33,14 @@ async def lifespan(app: FastAPI):
     logger.info("AgentMate 启动中...")
 
     try:
-        from eduagent.memory import MemoryManager
-        from eduagent.agents.coordinator import AgentCoordinator
-        from eduagent.agents.concept_qa import ConceptQAAgent
-        from eduagent.agents.teaching import TeachingAgent
-        from eduagent.agents.practice_agent import PracticeAgent
-        from eduagent.agents.paper_search import PaperSearchAgent
-        from eduagent.knowledge.retriever import KnowledgeBase
-        from eduagent.knowledge.parser import parse_directory
+        from agentmate.memory import MemoryManager
+        from agentmate.agents.coordinator import AgentCoordinator
+        from agentmate.agents.concept_qa import ConceptQAAgent
+        from agentmate.agents.teaching import TeachingAgent
+        from agentmate.agents.practice_agent import PracticeAgent
+        from agentmate.agents.paper_search import PaperSearchAgent
+        from agentmate.knowledge.retriever import KnowledgeBase
+        from agentmate.knowledge.parser import parse_directory
         from pathlib import Path
 
         # 知识库（Agent领域知识）
@@ -99,14 +99,14 @@ async def startup_event():
     if "coordinator" not in _app_state:
         logger.info("startup_event: 补充初始化 _app_state")
         try:
-            from eduagent.memory import MemoryManager
-            from eduagent.agents.coordinator import AgentCoordinator
-            from eduagent.agents.concept_qa import ConceptQAAgent
-            from eduagent.agents.teaching import TeachingAgent
-            from eduagent.agents.practice_agent import PracticeAgent
-            from eduagent.agents.paper_search import PaperSearchAgent
-            from eduagent.knowledge.retriever import KnowledgeBase
-            from eduagent.knowledge.parser import parse_directory
+            from agentmate.memory import MemoryManager
+            from agentmate.agents.coordinator import AgentCoordinator
+            from agentmate.agents.concept_qa import ConceptQAAgent
+            from agentmate.agents.teaching import TeachingAgent
+            from agentmate.agents.practice_agent import PracticeAgent
+            from agentmate.agents.paper_search import PaperSearchAgent
+            from agentmate.knowledge.retriever import KnowledgeBase
+            from agentmate.knowledge.parser import parse_directory
             from pathlib import Path
 
             kb = KnowledgeBase()
@@ -172,8 +172,8 @@ async def health():
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest):
-    from eduagent.agents.base import AgentState
-    from eduagent.memory import MemoryManager
+    from agentmate.agents.base import AgentState
+    from agentmate.memory import MemoryManager
 
     if "coordinator" not in _app_state:
         return ChatResponse(response="服务未初始化，请重启服务", intent="error")
@@ -243,7 +243,7 @@ async def get_memory(student_id: str = "default"):
 
 @app.post("/api/import")
 async def import_docs(req: ImportRequest):
-    from eduagent.knowledge.parser import parse_directory
+    from agentmate.knowledge.parser import parse_directory
     kb = _app_state["kb"]
     try:
         chunks = parse_directory(req.directory)
@@ -269,7 +269,7 @@ async def import_text(req: ImportTextRequest):
     kb = _app_state["kb"]
     if not req.content.strip():
         return {"imported": 0, "total": kb.size, "error": "内容为空"}
-    from eduagent.knowledge.parser import _split_paragraphs
+    from agentmate.knowledge.parser import _split_paragraphs
     paragraphs = _split_paragraphs(req.content)
     for p in paragraphs:
         kb.add(p, f"user://{req.title}", {"heading": req.title})
@@ -282,7 +282,7 @@ async def import_file(req: ImportFileRequest):
     kb = _app_state["kb"]
     if not req.content.strip():
         return {"imported": 0, "total": kb.size, "error": "文件内容为空"}
-    from eduagent.knowledge.parser import _split_paragraphs
+    from agentmate.knowledge.parser import _split_paragraphs
     paragraphs = _split_paragraphs(req.content)
     for p in paragraphs:
         kb.add(p, f"file://{req.filename}", {"heading": req.filename})
@@ -397,10 +397,10 @@ class PaperImportRequest(BaseModel):
 @app.post("/api/papers/search")
 async def search_papers_api(req: PaperSearchRequest):
     """搜索论文（返回结构化JSON）"""
-    from eduagent.knowledge.paper_api import search_papers as search_papers_func
-    from eduagent.agents.paper_search import PaperSearchAgent
+    from agentmate.knowledge.paper_api import search_papers as search_papers_func
+    from agentmate.agents.paper_search import PaperSearchAgent
     from langchain_openai import ChatOpenAI
-    from eduagent.config import settings
+    from agentmate.config import settings
 
     # LLM 提取搜索词
     try:
@@ -457,5 +457,5 @@ async def import_papers_api(req: PaperImportRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    from eduagent.config import settings
-    uvicorn.run("eduagent.api.main:app", host=settings.app.host, port=settings.app.port, reload=True)
+    from agentmate.config import settings
+    uvicorn.run("agentmate.api.main:app", host=settings.app.host, port=settings.app.port, reload=True)

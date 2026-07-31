@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 load_dotenv(Path(".env"))
 
 # 验证配置
-from eduagent.config import settings
+from agentmate.config import settings
 print(f"API Key: {settings.llm.api_key[:10]}...")
 print(f"Base URL: {settings.llm.base_url}")
 print(f"Model: {settings.llm.model}")
@@ -23,7 +23,7 @@ print(f"Model: {settings.llm.model}")
 # 启动 uvicorn
 import uvicorn
 uvicorn.run(
-    "eduagent.api.main:app",
+    "agentmate.api.main:app",
     host="0.0.0.0",
     port=8000,
     log_level="info",

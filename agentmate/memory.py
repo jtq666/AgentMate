@@ -151,7 +151,7 @@ class ShortTermMemory:
         """用 LLM 做摘要"""
         try:
             from langchain_openai import ChatOpenAI
-            from eduagent.config import settings
+            from agentmate.config import settings
             llm = ChatOpenAI(model=settings.llm.model, temperature=0,
                              api_key=settings.llm.api_key, base_url=settings.llm.base_url)
 
@@ -224,7 +224,7 @@ class LongTermMemory:
     """
 
     def __init__(self, storage_dir: Optional[str] = None):
-        self._dir = Path(storage_dir or "eduagent/data/memory")
+        self._dir = Path(storage_dir or "agentmate/data/memory")
         self._dir.mkdir(parents=True, exist_ok=True)
         self._memories: list[dict] = []
         self._doc_freqs: dict[str, int] = {}
@@ -424,7 +424,7 @@ class MemoryManager:
         self._llm = None
         try:
             from langchain_openai import ChatOpenAI
-            from eduagent.config import settings
+            from agentmate.config import settings
             self._llm = ChatOpenAI(
                 model=settings.llm.model, temperature=0, max_tokens=10,
                 api_key=settings.llm.api_key, base_url=settings.llm.base_url,

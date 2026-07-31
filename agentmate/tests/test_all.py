@@ -30,7 +30,7 @@ def main():
 
     # ===== 1. 三层记忆 =====
     print("\n--- 三层记忆系统 ---")
-    from eduagent.memory import MemoryManager
+    from agentmate.memory import MemoryManager
     mm = MemoryManager(student_id="test_student")
 
     mm.remember("什么是递归？", "user", 0.5)
@@ -55,7 +55,7 @@ def main():
 
     # ===== 2. 代码分析 =====
     print("\n--- 代码分析引擎 ---")
-    from eduagent.code_engine.analyzer import analyze_code, detect_language
+    from agentmate.code_engine.analyzer import analyze_code, detect_language
     code = '''#include <iostream>
 using namespace std;
 
@@ -89,7 +89,7 @@ int main() {
 
     # ===== 3. 知识检索 =====
     print("\n--- 知识检索 (RAG) ---")
-    from eduagent.knowledge.retriever import KnowledgeBase
+    from agentmate.knowledge.retriever import KnowledgeBase
     kb = KnowledgeBase()
     kb.add("递归是函数调用自身的编程技术")
     kb.add("快速排序使用分治思想，平均时间复杂度O(nlogn)")
@@ -108,7 +108,7 @@ int main() {
 
     # ===== 4. 意图路由（LLM驱动，测试回退规则）=====
     print("\n--- 意图路由 ---")
-    from eduagent.agents.coordinator import AgentCoordinator
+    from agentmate.agents.coordinator import AgentCoordinator
     c = AgentCoordinator()
     test("分类-出题", c._rule_fallback("出一道面试题", "") == "practice")
     test("分类-概念", c._rule_fallback("什么是ReAct", "") == "concept_qa")
@@ -117,7 +117,7 @@ int main() {
 
     # ===== 5. 文档解析 =====
     print("\n--- 文档解析 ---")
-    from eduagent.knowledge.parser import parse_file, parse_directory
+    from agentmate.knowledge.parser import parse_file, parse_directory
     from pathlib import Path
     data_dir = Path(__file__).parent.parent / "data" / "agent_knowledge"
     if data_dir.exists():
@@ -131,7 +131,7 @@ int main() {
 
     # ===== 6. Agent 基类 =====
     print("\n--- Agent 基类 ---")
-    from eduagent.agents.base import AgentState, BaseAgent
+    from agentmate.agents.base import AgentState, BaseAgent
     state = AgentState(user_query="测试", code="x = 1")
     state.log("test", "message")
     test("AgentState", len(state.execution_log) == 1)

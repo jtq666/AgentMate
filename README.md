@@ -67,14 +67,14 @@ python run_server.py
 
 **前端：**
 ```bash
-streamlit run eduagent/frontend/app.py
+streamlit run agentmate/frontend/app.py
 ```
 
 浏览器打开 http://localhost:8501
 
 ### 4. 导入知识库
 
-前端 → 📚 知识库 → 📁 导入目录 → `eduagent/data/agent_knowledge`
+前端 → 📚 知识库 → 📁 导入目录 → `agentmate/data/agent_knowledge`
 
 ### 5. 开始使用
 
@@ -86,7 +86,7 @@ streamlit run eduagent/frontend/app.py
 ## 项目结构
 
 ```
-eduagent/
+agentmate/
 ├── config.py              # 全局配置
 ├── memory.py              # 三层记忆系统(ChromaDB语义召回)
 ├── agents/

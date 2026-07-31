@@ -76,7 +76,7 @@ if page == "💬 概念问答":
     st.markdown('<p class="main-title">💬 Agent 概念问答</p>', unsafe_allow_html=True)
     st.markdown('<p class="sub-title">基于课程文档 + LLM 知识回答 · ReAct 引导式学习</p>', unsafe_allow_html=True)
 
-    chat_file = "eduagent/data/chat_history.json"
+    chat_file = "agentmate/data/chat_history.json"
 
     # 新用户引导
     if "chat_msgs" not in st.session_state or not st.session_state.get("chat_msgs"):
@@ -127,7 +127,7 @@ elif page == "🏋️ 面试模拟":
     st.markdown('<p class="main-title">🏋️ 面试模拟</p>', unsafe_allow_html=True)
     st.markdown('<p class="sub-title">AI 根据薄弱点出题 · 模拟保研面试问答</p>', unsafe_allow_html=True)
 
-    interview_file = "eduagent/data/interview_history.json"
+    interview_file = "agentmate/data/interview_history.json"
 
     if "interview_chat" not in st.session_state:
         if os.path.exists(interview_file):

@@ -200,7 +200,7 @@ class ProblemBank:
 class PracticeTracker:
     """答题追踪"""
 
-    def __init__(self, storage_dir: str = "eduagent/data/practice"):
+    def __init__(self, storage_dir: str = "agentmate/data/practice"):
         self._dir = Path(storage_dir)
         self._dir.mkdir(parents=True, exist_ok=True)
         self._records: dict[str, list[dict]] = {}

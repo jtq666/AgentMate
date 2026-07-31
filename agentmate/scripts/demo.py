@@ -25,7 +25,7 @@ async def main():
 
     # ===== 1. 三层记忆 =====
     section("1. 三层记忆系统")
-    from eduagent.memory import MemoryManager
+    from agentmate.memory import MemoryManager
 
     mm = MemoryManager(student_id="demo_student")
     conversations = [
@@ -61,7 +61,7 @@ async def main():
 
     # ===== 2. 代码分析 =====
     section("2. 代码分析引擎")
-    from eduagent.code_engine.analyzer import analyze_code, generate_report
+    from agentmate.code_engine.analyzer import analyze_code, generate_report
 
     code = '''def divide(a, b):
     return a / b
@@ -81,8 +81,8 @@ def process(data):
 
     # ===== 3. 知识检索 =====
     section("3. 知识检索 (RAG)")
-    from eduagent.knowledge.retriever import KnowledgeBase
-    from eduagent.knowledge.parser import parse_directory
+    from agentmate.knowledge.retriever import KnowledgeBase
+    from agentmate.knowledge.parser import parse_directory
     from pathlib import Path
 
     kb = KnowledgeBase()
@@ -105,7 +105,7 @@ def process(data):
 
     # ===== 4. 意图路由 =====
     section("4. 意图路由")
-    from eduagent.agents.coordinator import AgentCoordinator
+    from agentmate.agents.coordinator import AgentCoordinator
     c = AgentCoordinator()
     queries = [
         "帮我看看这段代码有没有bug",
@@ -119,11 +119,11 @@ def process(data):
 
     # ===== 5. Agent 系统（接 LLM）=====
     section("5. Agent 系统 (ReAct + RAG)")
-    from eduagent.agents.coordinator import AgentCoordinator
-    from eduagent.agents.code_review import CodeReviewAgent
-    from eduagent.agents.concept_qa import ConceptQAAgent
-    from eduagent.agents.teaching import TeachingAgent
-    from eduagent.agents.base import AgentState
+    from agentmate.agents.coordinator import AgentCoordinator
+    from agentmate.agents.code_review import CodeReviewAgent
+    from agentmate.agents.concept_qa import ConceptQAAgent
+    from agentmate.agents.teaching import TeachingAgent
+    from agentmate.agents.base import AgentState
 
     coordinator = AgentCoordinator()
     coordinator.register(CodeReviewAgent())
