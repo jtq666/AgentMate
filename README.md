@@ -47,7 +47,7 @@
 
 ```bash
 git clone git@github.com:jtq666/edu-agent.git
-cd edu-agent
+cd AgentMate
 cp .env.example .env
 # 编辑 .env 填入你的 DeepSeek API Key
 ```
