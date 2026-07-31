@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.pyc
+eduagent/data/memory/*.json
+eduagent/data/chat_history.json
+eduagent/data/interview_history.json
+eduagent/data/kb_dynamic.json
+*.egg-info/
+dist/
+.venv/
+venv/
