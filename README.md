@@ -1,6 +1,6 @@
 # AgentMate — AI Agent 研究助手
 
-> 基于多Agent协作的 AI Agent 学习系统，帮助你从零到一掌握 Agent 技术，准备保研/考研面试。
+> 基于多Agent协作的 AI Agent 学习系统，帮助你从零到一掌握 Agent 技术。
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue)](https://python.org) [![ChromaDB](https://img.shields.io/badge/ChromaDB-1.5-green)](https://trychroma.com) [![Streamlit](https://img.shields.io/badge/Streamlit-1.0-red)](https://streamlit.io)
 
