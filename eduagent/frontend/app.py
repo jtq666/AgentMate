@@ -1,5 +1,5 @@
 """
-EduAgent — AI Agent 研究助手 前端
+AgentMate — AI Agent 研究助手 前端
 """
 
 import streamlit as st
@@ -8,7 +8,7 @@ import re
 import json
 import os
 
-st.set_page_config(page_title="EduAgent - AI Agent 研究助手", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="AgentMate - AI Agent 研究助手", page_icon="🧠", layout="wide")
 
 st.markdown("""
 <style>
@@ -53,7 +53,7 @@ def check_api():
 
 # ==================== 侧边栏 ====================
 with st.sidebar:
-    st.markdown("## 🧠 EduAgent")
+    st.markdown("## 🧠 AgentMate")
     st.markdown("<p style='color:#6c757d;font-size:0.85rem'>AI Agent 研究助手</p>", unsafe_allow_html=True)
     st.markdown("---")
     page = st.radio("导航", [
@@ -66,7 +66,7 @@ with st.sidebar:
         st.markdown('<span style="color:#c62828;font-size:0.85rem">● 服务未启动</span>', unsafe_allow_html=True)
 
 if not check_api():
-    st.markdown('<p class="main-title">🧠 EduAgent — AI Agent 研究助手</p>', unsafe_allow_html=True)
+    st.markdown('<p class="main-title">🧠 AgentMate — AI Agent 研究助手</p>', unsafe_allow_html=True)
     st.warning("后端服务未启动\n\n请运行：`python run_server.py`")
     st.stop()
 

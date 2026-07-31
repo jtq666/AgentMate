@@ -30,7 +30,7 @@ _app_state = {}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """初始化所有组件"""
-    logger.info("EduAgent 启动中...")
+    logger.info("AgentMate 启动中...")
 
     try:
         from eduagent.memory import MemoryManager
@@ -79,17 +79,17 @@ async def lifespan(app: FastAPI):
         _app_state["coordinator"] = coordinator
         _app_state["kb"] = kb
 
-        logger.info("EduAgent 启动完成")
+        logger.info("AgentMate 启动完成")
     except Exception as e:
         logger.error(f"启动失败: {e}")
         import traceback
         traceback.print_exc()
 
     yield
-    logger.info("EduAgent 关闭")
+    logger.info("AgentMate 关闭")
 
 
-app = FastAPI(title="EduAgent API", version="0.2.0")
+app = FastAPI(title="AgentMate API", version="0.2.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 
@@ -164,7 +164,7 @@ class ImportRequest(BaseModel):
 
 @app.get("/")
 async def root():
-    return {"name": "EduAgent API", "version": "0.2.0", "docs": "/docs"}
+    return {"name": "AgentMate API", "version": "0.2.0", "docs": "/docs"}
 
 @app.get("/health")
 async def health():

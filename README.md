@@ -1,4 +1,4 @@
-# EduAgent — AI Agent 研究助手
+# AgentMate — AI Agent 研究助手
 
 > 基于多Agent协作的 AI Agent 学习系统，帮助你从零到一掌握 Agent 技术，准备保研/考研面试。
 
