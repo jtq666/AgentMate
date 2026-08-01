@@ -1,165 +1,201 @@
-# AgentMate — AI Agent 研究助手
+# AgentMate
 
-> 基于多Agent协作的 AI Agent 学习系统，帮助你从零到一掌握 Agent 技术。
+面向计算机保研学生的 **AI Agent 专题研学与面试训练平台**。
 
-[![Python](https://img.shields.io/badge/Python-3.10+-blue)](https://python.org) [![ChromaDB](https://img.shields.io/badge/ChromaDB-1.5-green)](https://trychroma.com) [![Streamlit](https://img.shields.io/badge/Streamlit-1.0-red)](https://streamlit.io)
+固定 Supervisor 多 Agent 流水线，融合混合检索、带引用讲解、模拟面试、自动评分与薄弱点复习，覆盖从资料检索到学习报告的完整闭环。
 
-## 核心特点
+![Python 3.12](https://img.shields.io/badge/python-3.12-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-green)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.35+-red)
 
-- **全部由 LLM 驱动**：意图分类、语言判断、题目选择、话题提取均由 LLM 自主决策，零硬编码规则
-- **真正的多Agent协作**：5 个 Agent 各有不同工具，通过 ToolRegistry 自主选择调用
-- **ChromaDB 语义检索**：RAG 知识库 + 长期记忆均为向量检索，非关键词匹配
-- **三层记忆系统**：工作记忆(滑动窗口) → 短期记忆(LLM压缩) → 长期记忆(ChromaDB语义召回)
-- **ReAct + Reflexion**：Agent 多步推理 + 自我反思修正
+## 效果数据
+
+基于 6 个专题 × 4 题 = 24 题固定基准，对四种配置进行消融实验：
+
+| 配置 | 必答点覆盖率 | 引用有效率 | 事实错误 | 平均延迟 |
+|------|:---:|:---:|:---:|:---:|
+| 单 LLM（无 RAG） | 76.0% | 0.0% | 1 | 6.6s |
+| 单 Agent + 混合 RAG | **95.8%** | **100%** | **0** | 2.6s |
+| 多 Agent（无 Reflexion） | 92.7% | 100% | 0 | 4.3s |
+| 完整多 Agent + RAG + Reflexion | **95.8%** | **100%** | **0** | 7.9s |
+
+> 混合 RAG 是主要质量增益来源；多 Agent 的核心价值在职责隔离、隐藏评分规则、阶段恢复与引用审计，而非无条件提升准确率。
 
 ## 架构
 
 ```
-用户输入
-  │
-  ▼
-┌──────────────────────────────┐
-│    Memory Manager (三层)      │
-│  工作→短期(LLM摘要)           │
-│    →长期(ChromaDB语义召回)    │
-├──────────────────────────────┤
-│  Coordinator (LLM意图路由)   │
-├──────┬──────┬──────┬─────────┤
-│Teaching│Concept│Practice│Paper│
-│ Agent  │  QA   │ Agent  │Search│
-│(ReAct) │ (RAG) │(个性化)│(API) │
-└──────┴──────┴──────┴─────────┘
+┌──────────────────────────────────────────────────────┐
+│                Streamlit 四页前端                      │
+│  研学工作台 │ 资料库 │ 实践评测 │ 学习报告              │
+└──────────┬───────────────────────────┬───────────────┘
+           │                           │
+     ┌─────▼─────┐              ┌──────▼──────┐
+     │  FastAPI   │              │  Evaluation  │
+     │  任务 API  │              │    Agent     │
+     └─────┬─────┘              └──────┬──────┘
+           │                           │
+     ┌─────▼───────────────────────────▼──────┐
+     │         单并发异步后台任务队列            │
+     └─────┬─────┬─────────┬─────────┬────────┘
+           │     │         │         │
+      Research Teaching  Interview Supervisor
+      Agent    Agent     Agent      Agent
+           │     │         │         │
+     ┌─────▼─────▼─────────▼─────────▼────┐
+     │    ChromaDB + BM25 + RRF 混合检索    │
+     │            SQLite WAL                │
+     └─────────────────────────────────────┘
 ```
 
-## 功能模块
+## 功能概览
 
-| 模块 | 说明 | 技术 |
-|------|------|------|
-| 💬 概念问答 | RAG检索 + ReAct引导式教学 + Reflexion反思 | ChromaDB + BM25 + RRF |
-| 🏋️ 面试模拟 | 根据学习历史个性化出题 | 记忆驱动的LLM出题 |
-| 🔬 论文检索 | 搜索 Semantic Scholar/arXiv 高质量论文 | 外部API工具调用 |
-| 📚 知识库 | 导入课程文档，支持 PDF/DOCX/MD/TXT | 语义分块 + 向量存储 |
-| 🧠 学习进度 | 三层记忆可视化，查看Agent记住了什么 | ChromaDB语义召回 |
+### 多 Agent 流水线
+
+| Agent | 职责 | 输出 |
+|-------|------|------|
+| **Research** | 混合检索资料，分配 `[Sx]` 引用编号 | `ResearchOutput`（来源、要点、警告） |
+| **Teaching** | 基于检索资料生成结构化讲解 | `TeachingOutput`（学习地图、概念、误区） |
+| **Interview** | 生成 5 道递进面试题，隐藏评分规则 | `InterviewOutput`（题目、rubric、必答点） |
+| **Evaluation** | 逐题评分，命中/遗漏/误解分析 | `EvaluationOutput`（分数、薄弱点、建议） |
+| **Supervisor** | 校验引用有效性，生成最终报告 | Markdown 报告 |
+
+Teaching Agent 内置 **Reflexion** 审校环节：生成讲解后由独立审校器检查引用有效性和覆盖度，不通过则修订后再次校验。
+
+### 混合 RAG
+
+- **ChromaDB 语义召回**：基于 `all-MiniLM-L6-v2` 本地 Embedding 的余弦相似度检索
+- **BM25 关键词召回**：中英文分词 + 二元组，TF-IDF 加权
+- **RRF 融合排序**：避免两路分数尺度不一致，按排名倒数分数聚合
+- **主题相关性过滤**：确定性关键词匹配，防止返回主题无关的最近邻文档
+
+### 学习闭环
+
+```
+选择专题 → 后台生成研学内容 → 阅读带引用讲解 → 5 题模拟面试
+→ Evaluation Agent 评分 → 自动更新掌握度和薄弱点 → 针对性复习
+```
+
+- 掌握度只由**正式测评证据**更新，不支持手动打卡
+- 薄弱点自动传入下一轮 Research、Teaching、Interview
+- 支持多会话导师答疑，基于任务资料保留引用
+
+### 工程可靠性
+
+- 单并发异步队列，阶段级 90s 超时 + 1 次自动重试
+- 重启自动标记中断任务，支持从失败阶段续跑
+- SQLite WAL + 外键，任务、阶段、产物、评测、掌握度全持久化
+- 论文检索失败回退本地资料，不阻断核心链路
 
 ## 快速开始
 
-### 1. 配置
+### 环境要求
+
+Python 3.12+
+
+### 安装
 
 ```bash
-git clone git@github.com:jtq666/edu-agent.git
+git clone https://github.com/jtq666/AgentMate.git
 cd AgentMate
-cp .env.example .env
-# 编辑 .env 填入你的 DeepSeek API Key
-```
-
-### 2. 安装依赖
-
-```bash
 pip install -r requirements.txt
 ```
 
-### 3. 启动
+### 配置
 
-**后端：**
+复制 `.env.example` 为 `.env`，填入 OpenAI 兼容接口信息：
+
+```env
+OPENAI_API_KEY=your-api-key
+OPENAI_BASE_URL=https://api.openai.com/v1
+OPENAI_MODEL=gpt-4o-mini
+```
+
+### 启动
+
 ```bash
+# 终端 1：后端
 python run_server.py
+
+# 终端 2：前端
+streamlit run agentmate/frontend/app.py --server.port 8501
 ```
 
-**前端：**
+Windows 可双击 `start_backend.bat` 和 `start_frontend.bat`。
+
+| 服务 | 地址 |
+|------|------|
+| 前端 | http://127.0.0.1:8501 |
+| 后端 API | http://127.0.0.1:8000 |
+| API 文档 | http://127.0.0.1:8000/docs |
+
+## 内置专题
+
+| 专题 | 检索查询 |
+|------|---------|
+| LLM Agent 基础 | Agent 智能体 定义 架构 自主决策 |
+| ReAct | ReAct Thought Action Observation 推理 行动 观察 |
+| 工具调用 | Agent 工具调用 Tool Calling Function Calling |
+| 多 Agent 协作 | 多 Agent 多智能体 协作 通信 分工 |
+| RAG | Agent RAG 检索增强生成 向量检索 |
+| 记忆系统 | Agent 记忆 工作记忆 长期记忆 Memory |
+
+支持自定义 AI Agent 相关主题（提交前检查范围与资料覆盖度）。
+
+## API
+
+| 方法 | 路径 | 用途 |
+|------|------|------|
+| POST | `/api/study/topics/check` | 检查自定义主题范围与资料覆盖度 |
+| POST | `/api/study/tasks` | 创建研学任务（异步，返回 202） |
+| GET | `/api/study/tasks/{task_id}` | 查询任务阶段与产物 |
+| POST | `/api/study/tasks/{task_id}/retry` | 从失败阶段重试 |
+| POST | `/api/study/tasks/{task_id}/chat` | 基于任务资料带引用追问 |
+| POST | `/api/study/tasks/{task_id}/assessments` | 提交 5 题答案进行评分 |
+| GET | `/api/assessments/{assessment_id}` | 查询评分与掌握度 |
+| GET | `/api/study/tasks/{task_id}/report` | 获取学习报告 |
+
+## 测试
+
 ```bash
-streamlit run agentmate/frontend/app.py
+pip install -r requirements-dev.txt
+pytest --cov=agentmate.study --cov-report=term-missing --cov-fail-under=80
 ```
 
-浏览器打开 http://localhost:8501
+## 对比实验
 
-### 4. 导入知识库
+```bash
+# 仅校验题集
+python -m agentmate.benchmarks.run_benchmark
 
-前端 → 📚 知识库 → 📁 导入目录 → `agentmate/data/agent_knowledge`
+# 执行真实模型实验
+python -m agentmate.benchmarks.run_benchmark --live
+```
 
-### 5. 开始使用
-
-- 💬 概念问答 → 问 "什么是ReAct？"
-- 🏋️ 面试模拟 → "出一道面试题"
-- 🔬 论文检索 → 搜索论文 → 勾选导入
-- 🧠 学习进度 → 查看记忆
+结果写入 `docs/evaluation/` 目录。
 
 ## 项目结构
 
 ```
 agentmate/
-├── config.py              # 全局配置
-├── memory.py              # 三层记忆系统(ChromaDB语义召回)
-├── agents/
-│   ├── base.py            # Agent基类 + 共享状态
-│   ├── arch.py            # ToolRegistry / ReAct / Plan-and-Execute / Reflexion
-│   ├── coordinator.py     # LLM驱动的意图路由
-│   ├── teaching.py        # ReAct教学Agent(Reflexion)
-│   ├── concept_qa.py      # RAG概念问答Agent
-│   ├── practice_agent.py  # 记忆驱动的面试出题Agent
-│   └── paper_search.py    # 论文检索Agent(arXiv/S2 API)
-├── code_engine/
-│   └── analyzer.py        # 代码复杂度分析
-├── knowledge/
-│   ├── parser.py          # 文档解析(PDF/DOCX/MD/TXT)
-│   ├── retriever.py       # ChromaDB + BM25 + RRF检索
-│   ├── practice.py        # 练习题库
-│   └── paper_api.py       # arXiv + Semantic Scholar API
-├── api/
-│   └── main.py            # FastAPI后端
-├── frontend/
-│   └── app.py             # Streamlit前端
-├── data/
-│   └── agent_knowledge/   # AI Agent领域课程文档
-└── tests/
-    └── test_all.py        # 21项单元测试
+├── api/              # FastAPI 后端
+├── study/            # 领域模型、Agent、工作流、持久化
+├── knowledge/        # 混合检索、论文 API、文档解析
+├── frontend/         # Streamlit 四页前端
+│   ├── app.py
+│   ├── common.py
+│   └── app_pages/    # 工作台、资料库、评测、报告
+├── benchmarks/       # 24 题对比实验
+└── data/             # 内置课程资料、SQLite、ChromaDB
 ```
 
 ## 技术栈
 
-| 层级 | 技术 |
-|------|------|
-| Agent 框架 | LangChain + 自研 ToolRegistry |
-| 推理模式 | ReAct / Reflexion / Plan-and-Execute |
-| 向量检索 | ChromaDB + BM25 + RRF 融合 |
-| Embedding | all-MiniLM-L6-v2 (本地) |
-| 知识库解析 | PDF (pdfplumber/PyMuPDF) + DOCX (python-docx) + MD |
-| 论文检索 | Semantic Scholar API + arXiv API |
-| 后端 | FastAPI |
-| 前端 | Streamlit |
-| LLM | DeepSeek-Chat (可替换任意 OpenAI 兼容 API) |
-
-## Agent 架构深度
-
-### ToolRegistry 工具注册
-
-```python
-# 每个Agent注册自己的工具，LLM根据描述自主选择
-ToolRegistry.register("retrieve_knowledge", "从课程知识库检索相关文档", kb.search)
-ToolRegistry.register("query_memory", "查询学生历史记录", memory.recall)
-```
-
-### ReAct 多步推理
-
-```
-Thought → 分析当前情况
-Action → 调用工具
-Observation → 观察结果
-→ 循环直到得出答案
-```
-
-### Reflexion 自我反思
-
-```
-生成回答 → 自我评审 → 不满意 → 修正重新生成
-```
-
-### 三层记忆
-
-| 层级 | 作用 | 生命周期 | 实现 |
-|------|------|---------|------|
-| 工作记忆 | 当前对话窗口 | 当前对话 | 滑动窗口 + Token管理 |
-| 短期记忆 | 溢出对话压缩 | 当前会话 | LLM摘要压缩 |
-| 长期记忆 | 跨会话持久化 | 永久 | ChromaDB语义召回 |
+- **后端**：FastAPI + uvicorn + asyncio
+- **前端**：Streamlit
+- **检索**：ChromaDB（向量）+ BM25（关键词）+ RRF（融合）
+- **Embedding**：sentence-transformers（all-MiniLM-L6-v2，本地）
+- **数据库**：SQLite WAL
+- **LLM**：任何 OpenAI 兼容接口
 
 ## License
 

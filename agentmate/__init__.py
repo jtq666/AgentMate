@@ -1,2 +1,3 @@
-"""EduAgent - 智能编程助教"""
-__version__ = "0.2.0"
+"""AgentMate：AI Agent 专题研学与保研面试训练平台。"""
+
+__version__ = "1.0.0"

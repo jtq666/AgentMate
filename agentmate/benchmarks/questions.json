@@ -1,0 +1,31 @@
+[
+  {"id":"basics-1","topic":"LLM Agent 基础","question":"LLM Agent 与普通聊天模型的核心区别是什么？","required_points":["目标驱动","状态","工具","反馈闭环"],"reference":"Agent 在目标约束下维护状态、选择工具，并根据环境反馈迭代。","source_id":"S1"},
+  {"id":"basics-2","topic":"LLM Agent 基础","question":"Agent 的感知、决策、行动闭环如何工作？","required_points":["感知输入","策略决策","执行行动","观察反馈"],"reference":"闭环包括读取环境、形成决策、执行动作、接收观察并更新状态。","source_id":"S1"},
+  {"id":"basics-3","topic":"LLM Agent 基础","question":"为什么要给 Agent 设置最大步数和停止条件？","required_points":["无限循环","成本","超时","可控性"],"reference":"边界限制可以防止循环，控制延迟与成本并提高系统可控性。","source_id":"S1"},
+  {"id":"basics-4","topic":"LLM Agent 基础","question":"如何评估一个 Agent 是否真正有效？","required_points":["任务成功率","质量","延迟","成本","失败分析"],"reference":"效果评估应同时衡量成功率、输出质量、延迟、成本和失败模式。","source_id":"S1"},
+
+  {"id":"react-1","topic":"ReAct","question":"解释 ReAct 的 Thought、Action、Observation 循环。","required_points":["Thought 推理","Action 行动","Observation 观察","循环更新"],"reference":"ReAct 交错生成推理与行动，并利用工具观察修正后续决策。","source_id":"S1"},
+  {"id":"react-2","topic":"ReAct","question":"ReAct 相比纯 Chain-of-Thought 有什么优势？","required_points":["外部工具","事实依据","动态修正","环境交互"],"reference":"ReAct 能通过工具连接外部环境，并用观察动态修正只依赖内部推理的结果。","source_id":"S1"},
+  {"id":"react-3","topic":"ReAct","question":"ReAct 可能出现哪些失败模式？","required_points":["错误工具","循环","观察误读","停止条件"],"reference":"典型问题包括选错工具、无效循环、误解观察和错误停止。","source_id":"S1"},
+  {"id":"react-4","topic":"ReAct","question":"怎样为 ReAct 设计可观测执行轨迹？","required_points":["步骤记录","工具参数","观察摘要","耗时","最终状态"],"reference":"轨迹应记录阶段、工具与参数、观察摘要、耗时和终止状态，同时避免暴露隐私推理。","source_id":"S1"},
+
+  {"id":"tools-1","topic":"工具调用","question":"Function Calling 的结构化参数为什么重要？","required_points":["Schema","参数校验","可执行性","减少歧义"],"reference":"结构化 Schema 约束参数类型，可校验调用并减少自然语言到执行之间的歧义。","source_id":"S1"},
+  {"id":"tools-2","topic":"工具调用","question":"工具注册表应保存哪些信息？","required_points":["名称","描述","参数模式","执行函数","权限"],"reference":"注册表需要工具名称、能力描述、参数 Schema、执行入口和权限边界。","source_id":"S1"},
+  {"id":"tools-3","topic":"工具调用","question":"怎样处理工具调用失败？","required_points":["错误分类","重试","超时","回退","可观测日志"],"reference":"应区分可重试与不可重试错误，并配置超时、有限重试、回退与日志。","source_id":"S1"},
+  {"id":"tools-4","topic":"工具调用","question":"如何防止 Agent 滥用高风险工具？","required_points":["最小权限","参数校验","审批","沙箱","审计"],"reference":"通过最小权限、输入校验、关键操作审批、隔离执行与审计降低风险。","source_id":"S1"},
+
+  {"id":"multi-1","topic":"多 Agent 协作","question":"什么时候多 Agent 比单 Agent 更合理？","required_points":["角色差异","上下游依赖","并行任务","收益大于成本"],"reference":"当角色输入输出不可替代、任务可分解或可并行，且质量收益覆盖通信成本时才适合多 Agent。","source_id":"S1"},
+  {"id":"multi-2","topic":"多 Agent 协作","question":"Supervisor 架构怎样控制协作顺序？","required_points":["固定阶段","共享状态","输出校验","失败处理"],"reference":"Supervisor 根据显式状态机推进固定阶段，校验结构化输出并处理失败与重试。","source_id":"S1"},
+  {"id":"multi-3","topic":"多 Agent 协作","question":"多 Agent 的主要通信开销是什么？","required_points":["上下文复制","模型调用","延迟","信息损失"],"reference":"角色间传递上下文会增加 token 与调用延迟，并可能在摘要中丢失信息。","source_id":"S1"},
+  {"id":"multi-4","topic":"多 Agent 协作","question":"如何证明多 Agent 不是为了展示而堆叠？","required_points":["单 Agent 基线","消融实验","质量指标","成本指标"],"reference":"需要与单 Agent 基线比较，并通过消融分别测量质量、成功率、延迟和成本。","source_id":"S1"},
+
+  {"id":"rag-1","topic":"RAG","question":"RAG 的检索与生成两阶段分别做什么？","required_points":["查询","召回","上下文","生成","引用"],"reference":"RAG 先根据查询召回证据，再把上下文交给模型生成带引用回答。","source_id":"S1"},
+  {"id":"rag-2","topic":"RAG","question":"为什么混合检索常优于单一向量检索？","required_points":["语义匹配","关键词精确匹配","互补","融合排序"],"reference":"向量检索捕获语义，BM25 擅长精确词项，两路召回经融合能互补。","source_id":"S1"},
+  {"id":"rag-3","topic":"RAG","question":"RRF 如何融合不同检索器结果？","required_points":["排名","倒数排名","无需分数归一化","聚合"],"reference":"RRF 对各列表名次计算倒数排名分数并累加，不要求原始分数同尺度。","source_id":"S1"},
+  {"id":"rag-4","topic":"RAG","question":"怎样计算引用有效率与覆盖率？","required_points":["引用可解析","来源存在","陈述被支持","被支持陈述比例"],"reference":"有效率关注引用是否真实且支持陈述，覆盖率关注需要证据的陈述中有多少得到引用。","source_id":"S1"},
+
+  {"id":"memory-1","topic":"记忆系统","question":"工作记忆、短期记忆、长期记忆有什么区别？","required_points":["当前上下文","会话摘要","持久知识","生命周期"],"reference":"三类记忆按生命周期与用途区分：当前上下文、阶段摘要和跨会话持久信息。","source_id":"S1"},
+  {"id":"memory-2","topic":"记忆系统","question":"长期记忆写入为什么需要重要性判断？","required_points":["噪声","存储成本","检索质量","隐私"],"reference":"无差别写入会积累噪声、增加成本、损害检索并扩大隐私风险。","source_id":"S1"},
+  {"id":"memory-3","topic":"记忆系统","question":"记忆检索怎样避免无关信息污染回答？","required_points":["相关性","时间衰减","重要性","阈值","来源"],"reference":"可结合相关性、时间、重要性与阈值筛选，并保留来源用于追溯。","source_id":"S1"},
+  {"id":"memory-4","topic":"记忆系统","question":"如何评估 Agent 记忆系统？","required_points":["召回准确率","任务收益","遗忘","隐私","延迟"],"reference":"评估应覆盖召回准确、下游任务收益、遗忘策略、隐私和检索延迟。","source_id":"S1"}
+]

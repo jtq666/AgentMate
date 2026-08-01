@@ -10,3 +10,4 @@ pdfplumber
 python-docx
 sentence-transformers
 requests
+pandas
